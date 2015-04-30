@@ -115,4 +115,6 @@ PRO process_directory, in_dir, revtime_file, out_dir
 
 	endfor
 
+	print, 'Finished processing directory.', systime()
+
 End
