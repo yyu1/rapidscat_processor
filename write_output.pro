@@ -9,10 +9,10 @@ PRO write_output, out_dir, total_image, count_image, current_year, current_day, 
 
 	if(is_hh) then begin
 		out_val_file = out_dir + '/RapidSCAT_pow_' + strtrim(string(current_year,format='(I4)'),2) + '_' + strtrim(string(current_day,format='(I03)'),2) + '_h.flt'
-		out_count_file = out_dir + '/RapidSCAT_count_' + strtrim(string(current_year,format='(I4)'),2) + '_' + strtrim(string(current_day,format='(I03)'),2) + '_h.flt'
+		out_count_file = out_dir + '/RapidSCAT_count_' + strtrim(string(current_year,format='(I4)'),2) + '_' + strtrim(string(current_day,format='(I03)'),2) + '_h.byt'
 	endif else begin
 		out_val_file = out_dir + '/RapidSCAT_pow_' + strtrim(string(current_year,format='(I4)'),2) + '_' + strtrim(string(current_day,format='(I03)'),2) + '_v.flt'
-		out_count_file = out_dir + '/RapidSCAT_count_' + strtrim(string(current_year,format='(I4)'),2) + '_' + strtrim(string(current_day,format='(I03)'),2) + '_v.flt'
+		out_count_file = out_dir + '/RapidSCAT_count_' + strtrim(string(current_year,format='(I4)'),2) + '_' + strtrim(string(current_day,format='(I03)'),2) + '_v.byt'
 	endelse
 
 
@@ -23,7 +23,7 @@ PRO write_output, out_dir, total_image, count_image, current_year, current_day, 
 		openw, count_lun, out_count_file, /get_lun
 		total_image[index] = total_image[index] / count_image[index]
 
-		writeu, val_lun, total_image
+		writeu, val_lun, float(total_image)
 		writeu, count_lun, count_image
 
 		free_lun, val_lun, count_lun
