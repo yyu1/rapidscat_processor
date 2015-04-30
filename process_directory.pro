@@ -5,6 +5,8 @@
 
 PRO process_directory, in_dir, revtime_file, out_dir
 
+	;!EXCEPT = 2  ;verbose reporting on math errors
+
 	;Test if in_dir and out_dir exists
 	if(not(file_test(in_dir, /directory) and file_test(out_dir, /directory))) then begin
 		print, 'Fatal Error:  input or output directory not valid.', in_dir, out_dir
@@ -41,8 +43,8 @@ PRO process_directory, in_dir, revtime_file, out_dir
 
 	;Create image for current total and count
 	;0.25deg x 0.25 deg
-	power_total_hh = fltarr(1440,720)
-	power_total_vv = fltarr(1440,720)
+	power_total_hh = dblarr(1440,720)
+	power_total_vv = dblarr(1440,720)
 	pulse_count_hh = bytarr(1440,720)
 	pulse_count_vv = bytarr(1440,720)
 	current_year_hh = 0
@@ -52,9 +54,9 @@ PRO process_directory, in_dir, revtime_file, out_dir
 
 	;Cycle through each input revolution file.  Based on the naming convention, files should be in chronological order
 
-	for i=0, n_infiles-1 do begin
-		cur_file = input_files[i]
-		cur_rev = fix(strmid(cur_file,6,5))
+	for i_file=0, n_infiles-1 do begin
+		cur_file = input_files[i_file]
+		cur_rev = fix(strmid(cur_file,strlen(in_dir)+1+6,5))
 
 		rev_index = where(revnum eq cur_rev, count)
 		if (count ne 1) then begin
