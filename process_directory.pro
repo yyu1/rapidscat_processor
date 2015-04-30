@@ -70,8 +70,11 @@ PRO process_directory, in_dir, revtime_file, out_dir
 		;Process hh pulses
 		n_h_pulse = n_elements(sigma0_hh)
 		for i=0, n_h_pulse-1 do begin
-			x_ind = fix(lon_hh[i] * 0.01 / 0.25)   ; Longitude is stored as integer in units of 0.01 degrees from 0 to 360 deg
-			y_ind = fix((90 - lat_hh[i] * 0.01) / 0.25) ; Latitude is stored as integer in units of 0.01 degrees from -90 to 90 deg
+			;x_ind = fix(lon_hh[i] * 0.01 / 0.25)   ; Longitude is stored as integer in units of 0.01 degrees from 0 to 360 deg
+			;y_ind = fix((90 - lat_hh[i] * 0.01) / 0.25) ; Latitude is stored as integer in units of 0.01 degrees from -90 to 90 deg
+			;apparently documentation is wrong, lon and lat are read out as floating points
+			x_ind = fix(lon_hh[i] / 0.25)  
+			y_ind = fix((90 - lat_hh[i]) / 0.25) 
 			
 			if ((day_hh[i] ne current_day_hh) or (year_hh[i] ne current_year_hh)) then begin
 				;Reached new day, write output, and reset
@@ -94,8 +97,11 @@ PRO process_directory, in_dir, revtime_file, out_dir
 		;Process vv pulses
 		n_v_pulse = n_elements(sigma0_vv)
 		for i=0, n_v_pulse-1 do begin
-			x_ind = fix(lon_vv[i] * 0.01 / 0.25)   ; Longitude is stored as integer in units of 0.01 degrees from 0 to 360 deg
-			y_ind = fix((90 - lat_vv[i] * 0.01) / 0.25) ; Latitude is stored as integer in units of 0.01 degrees from -90 to 90 deg
+			;x_ind = fix(lon_vv[i] * 0.01 / 0.25)   ; Longitude is stored as integer in units of 0.01 degrees from 0 to 360 deg
+			;y_ind = fix((90 - lat_vv[i] * 0.01) / 0.25) ; Latitude is stored as integer in units of 0.01 degrees from -90 to 90 deg
+			;apparently documentation is wrong, lon and lat are read out as floating points
+			x_ind = fix(lon_hh[i] / 0.25)  
+			y_ind = fix((90 - lat_hh[i]) / 0.25) 
 			
 			if ((day_vv[i] ne current_day_vv) or (year_vv[i] ne current_year_vv)) then begin
 				;Reached new day, write output, and reset
