@@ -75,6 +75,8 @@ PRO process_directory, in_dir, revtime_file, out_dir
 			;apparently documentation is wrong, lon and lat are read out as floating points
 			x_ind = fix(lon_hh[i] / 0.25)  
 			y_ind = fix((90 - lat_hh[i]) / 0.25) 
+			if (x_ind eq 1440) then x_ind = 0  ; wrap end points
+			if (y_ind eq 720) then y_ind = 0  ; wrap end points
 			
 			if ((day_hh[i] ne current_day_hh) or (year_hh[i] ne current_year_hh)) then begin
 				;Reached new day, write output, and reset
@@ -102,6 +104,8 @@ PRO process_directory, in_dir, revtime_file, out_dir
 			;apparently documentation is wrong, lon and lat are read out as floating points
 			x_ind = fix(lon_hh[i] / 0.25)  
 			y_ind = fix((90 - lat_hh[i]) / 0.25) 
+			if (x_ind eq 1440) then x_ind = 0  ; wrap end points
+			if (y_ind eq 720) then y_ind = 0  ; wrap end points
 			
 			if ((day_vv[i] ne current_day_vv) or (year_vv[i] ne current_year_vv)) then begin
 				;Reached new day, write output, and reset
