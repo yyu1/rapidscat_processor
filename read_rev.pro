@@ -32,7 +32,7 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, lon_hh, lon
 	hdf_file_id = hdf_open(file_name, /read)
 	vd_id = hdf_vd_getid(hdf_file_id, -1)
 	frame_time_handle = hdf_vd_attach(hdf_file_id, vd_id, /read)
-	nframes = hdf_vd_read(vd_handle, frame_time)
+	nframes = hdf_vd_read(frame_time_handle, frame_time)
 	hdf_vd_detach,frame_time_handle
 
 	frame_time = string(frame_time)  ;Cast to type string (original 2D byte type)
@@ -50,20 +50,23 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, lon_hh, lon
 
 	;Create measurement_mask, hh_mask, and vv_mask from sigma0_mode_flag
 	sds_id = hdf_sd_nametoindex(sd_interface, 'sigma0_mode_flag')
-	hdf_sd_getdata, sds_id, sigma0_mode_flag
+	sds_data_id = hdf_sd_select(sd_interface, sds_id)
+	hdf_sd_getdata, sds_data_id, sigma0_mode_flag
 
 	process_sigma0_mode_flag, sigma0_mode_flag, measure_mask, hh_mask, vv_mask
 
 	;Create	quality_mask
 	sds_id = hdf_sd_nametoindex(sd_interface, 'sigma0_qual_flag')
-	hdf_sd_getdata, sds_id, sigma0_qual_flag
+	sds_data_id = hdf_sd_select(sd_interface, sds_id)
+	hdf_sd_getdata, sds_data_id, sigma0_qual_flag
 
 	quality_mask = create_quality_mask(sigma0_qual_flag)
 
 
 	;Create frequency mask
 	sds_id = hdf_sd_nametoindex(sd_interface, 'frequency_shift')
-	hdf_sd_getdata, sds_id, frequency_shift
+	sds_data_id = hdf_sd_select(sd_interface, sds_id)
+	hdf_sd_getdata, sds_data_id, frequency_shift
 
 	frequency_mask = create_frequency_mask(frequency_shift)
 	
@@ -75,11 +78,14 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, lon_hh, lon
 	if (hh_count + vv_count gt 0) then begin
 		;we have valid data, read data from HDF file
 		sds_id = hdf_sd_nametoindex(sd_interface, 'cell_sigma0')
-		hdf_sd_getdata, sds_id, cell_sigma0
+		sds_data_id = hdf_sd_select(sd_interface, sds_id)
+		hdf_sd_getdata, sds_data_id, cell_sigma0
 		sds_id = hdf_sd_nametoindex(sd_interface, 'cell_lon')
-		hdf_sd_getdata, sds_id, cell_lon
+		sds_data_id = hdf_sd_select(sd_interface, sds_id)
+		hdf_sd_getdata, sds_data_id, cell_lon
 		sds_id = hdf_sd_nametoindex(sd_interface, 'cell_lat')
-		hdf_sd_getdata, sds_id, cell_lat
+		sds_data_id = hdf_sd_select(sd_interface, sds_id)
+		hdf_sd_getdata, sds_data_id, cell_lat
 
 		;create year and day arrays from frame_time
 		frame_year = intarr(nframes)
