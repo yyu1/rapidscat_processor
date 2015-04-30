@@ -102,8 +102,8 @@ PRO process_directory, in_dir, revtime_file, out_dir
 			;x_ind = fix(lon_vv[i] * 0.01 / 0.25)   ; Longitude is stored as integer in units of 0.01 degrees from 0 to 360 deg
 			;y_ind = fix((90 - lat_vv[i] * 0.01) / 0.25) ; Latitude is stored as integer in units of 0.01 degrees from -90 to 90 deg
 			;apparently documentation is wrong, lon and lat are read out as floating points
-			x_ind = fix(lon_hh[i] / 0.25)  
-			y_ind = fix((90 - lat_hh[i]) / 0.25) 
+			x_ind = fix(lon_vv[i] / 0.25)  
+			y_ind = fix((90 - lat_vv[i]) / 0.25) 
 			if (x_ind eq 1440) then x_ind = 0  ; wrap end points
 			if (y_ind eq 720) then y_ind = 0  ; wrap end points
 			
