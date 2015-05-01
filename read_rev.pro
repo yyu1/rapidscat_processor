@@ -9,7 +9,7 @@
 ;same for all <variable>_vv
 
 
-PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, lon_hh, lon_vv, lat_hh, lat_vv, day_hh, day_vv, year_hh, year_vv
+PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, inc_rad_hh, inc_rad_vv, lon_hh, lon_vv, lat_hh, lat_vv, day_hh, day_vv, year_hh, year_vv
 
 	if (not hdf_ishdf(file_name)) then begin
 		print, 'Invalid HDF file:', file_name
@@ -92,7 +92,6 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, lon_hh, lon
 		sds_data_id = hdf_sd_select(sd_interface, sds_id)
 		hdf_sd_getdata, sds_data_id, cell_incidence
 		cell_incidence_rad = float(cell_incidence)/18000. * !PI
-		cell_sigma0 = cell_sigma0 / cos(cell_incidence_rad)
 
 		;create year and day arrays from frame_time
 		frame_year = intarr(nframes)
@@ -107,6 +106,7 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, lon_hh, lon
 		if (hh_count gt 0) then begin
 			;We have valid pulses for hh polarization
 			sigma0_hh = cell_sigma0[hh_index]
+			inc_rad_hh = cell_incidence_rad[hh_index]
 			lon_hh = cell_lon[hh_index]
 			lat_hh = cell_lat[hh_index]
 			day_hh = intarr(hh_count)
@@ -118,6 +118,7 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, lon_hh, lon
 		if (vv_count gt 0) then begin
 			;We have valid pulses for vv polarization
 			sigma0_vv = cell_sigma0[vv_index]
+			inc_rad_vv = cell_incidence_rad[vv_index]
 			lon_vv = cell_lon[vv_index]
 			lat_vv = cell_lat[vv_index]
 			day_vv = intarr(vv_count)

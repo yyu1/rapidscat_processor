@@ -70,7 +70,7 @@ PRO process_directory, in_dir, revtime_file, out_dir
 		endif
 
 		;process file
-		read_rev, cur_file, start_time[rev_index], end_time[rev_index], sigma0_hh, sigma0_vv, lon_hh, lon_vv, lat_hh, lat_vv, day_hh, day_vv, year_hh, year_vv
+		read_rev, cur_file, start_time[rev_index], end_time[rev_index], sigma0_hh, sigma0_vv, inc_rad_hh, inc_rad_vv, lon_hh, lon_vv, lat_hh, lat_vv, day_hh, day_vv, year_hh, year_vv
 
 		;Process hh pulses
 		n_h_pulse = n_elements(sigma0_hh)
@@ -78,9 +78,10 @@ PRO process_directory, in_dir, revtime_file, out_dir
 			;x_ind = fix(lon_hh[i] * 0.01 / 0.25)   ; Longitude is stored as integer in units of 0.01 degrees from 0 to 360 deg
 			;y_ind = fix((90 - lat_hh[i] * 0.01) / 0.25) ; Latitude is stored as integer in units of 0.01 degrees from -90 to 90 deg
 			;apparently documentation is wrong, lon and lat are read out as floating points
-			x_ind = fix(lon_hh[i] / 0.25)  
+			x_ind = fix(lon_hh[i] / 0.25)
 			y_ind = fix((90 - lat_hh[i]) / 0.25) 
 			if (x_ind eq 1440) then x_ind = 0  ; wrap end points
+			if (x_ind lt 720) then x_ind += 720 else x_ind -=720   ; change to -180 to 180 degree format
 			if (y_ind eq 720) then y_ind = 0  ; wrap end points
 			
 			if ((day_hh[i] ne current_day_hh) or (year_hh[i] ne current_year_hh)) then begin
@@ -95,7 +96,7 @@ PRO process_directory, in_dir, revtime_file, out_dir
 				current_day_hh = day_hh[i]
 			endif
 
-			power_total_hh[x_ind,y_ind] += 10.^ (float(sigma0_hh[i]) / 100)
+			power_total_hh[x_ind,y_ind] += (10.^ (float(sigma0_hh[i]) / 100))/cos(inc_rad_hh[i])
 			pulse_count_hh[x_ind,y_ind] += 1
 
 		endfor			
@@ -110,6 +111,7 @@ PRO process_directory, in_dir, revtime_file, out_dir
 			x_ind = fix(lon_vv[i] / 0.25)  
 			y_ind = fix((90 - lat_vv[i]) / 0.25) 
 			if (x_ind eq 1440) then x_ind = 0  ; wrap end points
+			if (x_ind lt 720) then x_ind += 720 else x_ind -=720   ; change to -180 to 180 degree format
 			if (y_ind eq 720) then y_ind = 0  ; wrap end points
 			
 			if ((day_vv[i] ne current_day_vv) or (year_vv[i] ne current_year_vv)) then begin
@@ -124,7 +126,7 @@ PRO process_directory, in_dir, revtime_file, out_dir
 				current_day_vv = day_vv[i]
 			endif
 
-			power_total_vv[x_ind,y_ind] += 10.^ (float(sigma0_vv[i]) / 100)
+			power_total_vv[x_ind,y_ind] += (10.^ (float(sigma0_vv[i]) / 100))/cos(inc_rad_vv[i])
 			pulse_count_vv[x_ind,y_ind] += 1
 
 		endfor			
