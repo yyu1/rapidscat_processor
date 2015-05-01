@@ -57,11 +57,16 @@ PRO process_directory, in_dir, revtime_file, out_dir
 	for i_file=0, n_infiles-1 do begin
 		cur_file = input_files[i_file]
 		cur_rev = fix(strmid(cur_file,strlen(in_dir)+1+6,5))
-
+		
 		rev_index = where(revnum eq cur_rev, count)
 		if (count ne 1) then begin
 			print, 'ERROR!  rev number matching error ', cur_file, cur_rev, '   n matches: ', count
 			exit
+		endif
+
+		if (strmid(note[rev_index],0,3) eq 'BAD') then begin
+			print, 'Bad rev at rev#', cur_rev, '  skipping...'
+			continue
 		endif
 
 		;process file
