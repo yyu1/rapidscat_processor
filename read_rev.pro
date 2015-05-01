@@ -87,6 +87,13 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, lon_hh, lon
 		sds_data_id = hdf_sd_select(sd_interface, sds_id)
 		hdf_sd_getdata, sds_data_id, cell_lat
 
+		;incidence angle correction
+		sds_id = hdf_sd_nametoindex(sd_interface, 'cell_incidence')
+		sds_data_id = hdf_sd_select(sd_interface, sds_id)
+		hdf_sd_getdata, sds_data_id, cell_incidence
+		cell_incidence_rad = float(cell_incidence)/18000. * !PI
+		cell_sigma0 = cell_sigma0 / cos(cell_incidence_rad)
+
 		;create year and day arrays from frame_time
 		frame_year = intarr(nframes)
 		frame_day = intarr(nframes)
