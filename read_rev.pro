@@ -9,7 +9,7 @@
 ;same for all <variable>_vv
 
 
-PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, inc_rad_hh, inc_rad_vv, lon_hh, lon_vv, lat_hh, lat_vv, day_hh, day_vv, year_hh, year_vv
+PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, inc_rad_hh, inc_rad_vv, lon_hh, lon_vv, lat_hh, lat_vv, day_hh, day_vv, year_hh, year_vv, local_hr_hh, local_hr_vv
 
 	if (not hdf_ishdf(file_name)) then begin
 		print, 'Invalid HDF file:', file_name
@@ -26,6 +26,8 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, inc_rad_hh,
 	undefine, day_vv
 	undefine, year_hh
 	undefine, year_vv
+	undefine, local_hr_hh
+	undefine, local_hr_vv
 
 
 	;Get frame_time from VData
@@ -93,13 +95,15 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, inc_rad_hh,
 		hdf_sd_getdata, sds_data_id, cell_incidence
 		cell_incidence_rad = float(cell_incidence)/18000. * !PI
 
-		;create year and day arrays from frame_time
+		;create year, day, and hr arrays from frame_time
 		frame_year = intarr(nframes)
 		frame_day = intarr(nframes)
+		frame_hr = intarr(nframes)
 		for i=0, nframes-1 do begin
 			parse_time, frame_time[i], year, day, hour, minute, second, second_dec
 			frame_year[i] = year
 			frame_day[i] = day
+			frame_hr[i] = hour
 		endfor
 
 
@@ -113,6 +117,13 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, inc_rad_hh,
 			day_hh[*] = frame_day[hh_index/100] ; dividing by 100 casts it to the right dimension within nframes, since 100 is xdim, and hh_index is taken as 1D index
 			year_hh = intarr(hh_count)
 			year_hh[*] = frame_year[hh_index/100]
+			local_hr_hh = intarr(hh_count)
+			local_hr_hh[*] = fix(frame_hr[hh_index/100] + (lon_hh-180)/15)  ;/15 = /180 * 12
+			;wrap hr < 0 and hr > 23
+			index = where(local_hr_hh lt 0, count)
+			if (count gt 0) then local_hr_hh[index] += 24
+			index = where(local_hr_hh gt 23, count)
+			if (count gt 0) then local_hr_hh[index] -= 24
 		endif
 
 		if (vv_count gt 0) then begin
@@ -125,6 +136,13 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, inc_rad_hh,
 			day_vv[*] = frame_day[vv_index/100] ; dividing by 100 casts it to the right dimension within nframes, since 100 is xdim, and vv_index is taken as 1D index
 			year_vv = intarr(vv_count)
 			year_vv[*] = frame_year[vv_index/100]
+			local_hr_vv = intarr(vv_count)
+			local_hr_vv[*] = fix(frame_hr[vv_index/100] + (lon_vv-180)/15)  ;/15 = /180 * 12
+			;wrap hr < 0 and hr > 23
+			index = where(local_hr_vv lt 0, count)
+			if (count gt 0) then local_hr_vv[index] += 24
+			index = where(local_hr_vv gt 23, count)
+			if (count gt 0) then local_hr_vv[index] -= 24
 		endif
 
 	endif
