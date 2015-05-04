@@ -63,7 +63,7 @@ PRO process_directory, in_dir, revtime_file, out_dir
 		rev_index = where(revnum eq cur_rev, count)
 		if (count ne 1) then begin
 			print, 'ERROR!  rev number matching error ', cur_file, cur_rev, '   n matches: ', count
-			exit
+			continue
 		endif
 
 		if (strmid(note[rev_index],0,3) eq 'BAD') then begin
@@ -98,8 +98,8 @@ PRO process_directory, in_dir, revtime_file, out_dir
 				current_mon_hh = day_hh[i]/30
 			endif
 
-			power_total_hh[x_ind,y_ind,local_hr_hh] += (10.^ (sigma0_hh[i] / 1000))/cos(inc_rad_hh[i])
-			pulse_count_hh[x_ind,y_ind,local_hr_hh] += 1
+			power_total_hh[x_ind,y_ind,local_hr_hh[i]] += (10.^ (sigma0_hh[i] / 1000))/cos(inc_rad_hh[i])
+			pulse_count_hh[x_ind,y_ind,local_hr_hh[i]] += 1
 
 		endfor			
 
@@ -128,8 +128,8 @@ PRO process_directory, in_dir, revtime_file, out_dir
 				current_mon_vv = day_vv[i]/30
 			endif
 
-			power_total_vv[x_ind,y_ind,local_hr_vv] += (10.^ (sigma0_vv[i] / 1000))/cos(inc_rad_vv[i])
-			pulse_count_vv[x_ind,y_ind,local_hr_vv] += 1
+			power_total_vv[x_ind,y_ind,local_hr_vv[i]] += (10.^ (sigma0_vv[i] / 1000))/cos(inc_rad_vv[i])
+			pulse_count_vv[x_ind,y_ind,local_hr_vv[i]] += 1
 
 		endfor			
 
