@@ -96,7 +96,7 @@ PRO process_directory, in_dir, revtime_file, out_dir
 				current_day_hh = day_hh[i]
 			endif
 
-			power_total_hh[x_ind,y_ind] += (10.^ (float(sigma0_hh[i]) / 100))/cos(inc_rad_hh[i])
+			power_total_hh[x_ind,y_ind] += (10.^ (float(sigma0_hh[i]) / 1000))/cos(inc_rad_hh[i])
 			pulse_count_hh[x_ind,y_ind] += 1
 
 		endfor			
@@ -126,7 +126,7 @@ PRO process_directory, in_dir, revtime_file, out_dir
 				current_day_vv = day_vv[i]
 			endif
 
-			power_total_vv[x_ind,y_ind] += (10.^ (float(sigma0_vv[i]) / 100))/cos(inc_rad_vv[i])
+			power_total_vv[x_ind,y_ind] += (10.^ (float(sigma0_vv[i]) / 1000))/cos(inc_rad_vv[i])
 			pulse_count_vv[x_ind,y_ind] += 1
 
 		endfor			
