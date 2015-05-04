@@ -43,14 +43,16 @@ PRO process_directory, in_dir, revtime_file, out_dir
 
 	;Create image for current total and count
 	;0.25deg x 0.25 deg
-	power_total_hh = dblarr(1440,720)
-	power_total_vv = dblarr(1440,720)
-	pulse_count_hh = bytarr(1440,720)
-	pulse_count_vv = bytarr(1440,720)
+	power_total_hh = fltarr(1440,720,24)
+	power_total_vv = fltarr(1440,720,24)
+	pulse_count_hh = bytarr(1440,720,24)
+	pulse_count_vv = bytarr(1440,720,24)
 	current_year_hh = 0
 	current_year_vv = 0
-	current_day_hh = 0
-	current_day_vv = 0
+	;current_day_hh = 0
+	;current_day_vv = 0
+	current_mon_hh = 0  ;Month here is defined as (Julian day / 30)  where the division is integer division
+	current_mon_vv = 0  ;Therefore, the last month has 35 - 36 days, this is used to tell when to reset our averaging
 
 	;Cycle through each input revolution file.  Based on the naming convention, files should be in chronological order
 
@@ -70,7 +72,7 @@ PRO process_directory, in_dir, revtime_file, out_dir
 		endif
 
 		;process file
-		read_rev, cur_file, start_time[rev_index], end_time[rev_index], sigma0_hh, sigma0_vv, inc_rad_hh, inc_rad_vv, lon_hh, lon_vv, lat_hh, lat_vv, day_hh, day_vv, year_hh, year_vv
+		read_rev, cur_file, start_time[rev_index], end_time[rev_index], sigma0_hh, sigma0_vv, inc_rad_hh, inc_rad_vv, lon_hh, lon_vv, lat_hh, lat_vv, day_hh, day_vv, year_hh, year_vv, local_hr_hh, local_hr_vv
 
 		;Process hh pulses
 		n_h_pulse = n_elements(sigma0_hh)
@@ -84,20 +86,20 @@ PRO process_directory, in_dir, revtime_file, out_dir
 			if (x_ind lt 720) then x_ind += 720 else x_ind -=720   ; change to -180 to 180 degree format
 			if (y_ind eq 720) then y_ind = 0  ; wrap end points
 			
-			if ((day_hh[i] ne current_day_hh) or (year_hh[i] ne current_year_hh)) then begin
-				;Reached new day, write output, and reset
-				write_output, out_dir, power_total_hh, pulse_count_hh, current_year_hh, current_day_hh, 1  ;1 because this is h polarization
+			if ((day_hh[i]/30 ne current_mon_hh) or (year_hh[i] ne current_year_hh)) then begin
+				;Reached new mon, write output, and reset
+				write_output, out_dir, power_total_hh, pulse_count_hh, current_year_hh, current_mon_hh, 1  ;1 because this is h polarization
 
-				;after writing output of previous collected data, reset to new day and add our current pulse
+				;after writing output of previous collected data, reset to new mon and add our current pulse
 				power_total_hh[*] = 0
 				pulse_count_hh[*] = 0
 
 				current_year_hh = year_hh[i]
-				current_day_hh = day_hh[i]
+				current_mon_hh = day_hh[i]/30
 			endif
 
-			power_total_hh[x_ind,y_ind] += (10.^ (float(sigma0_hh[i]) / 1000))/cos(inc_rad_hh[i])
-			pulse_count_hh[x_ind,y_ind] += 1
+			power_total_hh[x_ind,y_ind,local_hr_hh] += (10.^ (sigma0_hh[i] / 1000))/cos(inc_rad_hh[i])
+			pulse_count_hh[x_ind,y_ind,local_hr_hh] += 1
 
 		endfor			
 
@@ -114,20 +116,20 @@ PRO process_directory, in_dir, revtime_file, out_dir
 			if (x_ind lt 720) then x_ind += 720 else x_ind -=720   ; change to -180 to 180 degree format
 			if (y_ind eq 720) then y_ind = 0  ; wrap end points
 			
-			if ((day_vv[i] ne current_day_vv) or (year_vv[i] ne current_year_vv)) then begin
-				;Reached new day, write output, and reset
-				write_output, out_dir, power_total_vv, pulse_count_vv, current_year_vv, current_day_vv, 0  ;0 because this is v polarization
+			if ((day_vv[i]/30 ne current_mon_vv) or (year_vv[i] ne current_year_vv)) then begin
+				;Reached new mon, write output, and reset
+				write_output, out_dir, power_total_vv, pulse_count_vv, current_year_vv, current_mon_vv, 0  ;0 because this is v polarization
 
-				;after writing output of previous collected data, reset to new day and add our current pulse
+				;after writing output of previous collected data, reset to new mon and add our current pulse
 				power_total_vv[*] = 0
 				pulse_count_vv[*] = 0
 
 				current_year_vv = year_vv[i]
-				current_day_vv = day_vv[i]
+				current_mon_vv = day_vv[i]/30
 			endif
 
-			power_total_vv[x_ind,y_ind] += (10.^ (float(sigma0_vv[i]) / 1000))/cos(inc_rad_vv[i])
-			pulse_count_vv[x_ind,y_ind] += 1
+			power_total_vv[x_ind,y_ind,local_hr_vv] += (10.^ (sigma0_vv[i] / 1000))/cos(inc_rad_vv[i])
+			pulse_count_vv[x_ind,y_ind,local_hr_vv] += 1
 
 		endfor			
 
