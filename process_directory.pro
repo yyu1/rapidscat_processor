@@ -71,6 +71,7 @@ PRO process_directory, in_dir, revtime_file, out_dir
 			continue
 		endif
 
+		print, 'Processing file: ', cur_file
 		;process file
 		read_rev, cur_file, start_time[rev_index], end_time[rev_index], sigma0_hh, sigma0_vv, inc_rad_hh, inc_rad_vv, lon_hh, lon_vv, lat_hh, lat_vv, day_hh, day_vv, year_hh, year_vv, local_hr_hh, local_hr_vv
 
@@ -133,11 +134,11 @@ PRO process_directory, in_dir, revtime_file, out_dir
 
 		endfor			
 
-		;Flush the remaining cache
-		write_output, out_dir, power_total_hh, pulse_count_hh, current_year_hh, current_mon_hh, 1  ;1 because this is h polarization
-		write_output, out_dir, power_total_vv, pulse_count_vv, current_year_vv, current_mon_vv, 0  ;0 because this is v polarization
 
 	endfor
+	;Flush the remaining cache
+	write_output, out_dir, power_total_hh, pulse_count_hh, current_year_hh, current_mon_hh, 1  ;1 because this is h polarization
+	write_output, out_dir, power_total_vv, pulse_count_vv, current_year_vv, current_mon_vv, 0  ;0 because this is v polarization
 
 	print, 'Finished processing directory.', systime()
 
