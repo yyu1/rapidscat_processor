@@ -133,6 +133,9 @@ PRO process_directory, in_dir, revtime_file, out_dir
 
 		endfor			
 
+		;Flush the remaining cache
+		write_output, out_dir, power_total_hh, pulse_count_hh, current_year_hh, current_mon_hh, 1  ;1 because this is h polarization
+		write_output, out_dir, power_total_vv, pulse_count_vv, current_year_vv, current_mon_vv, 0  ;0 because this is v polarization
 
 	endfor
 
