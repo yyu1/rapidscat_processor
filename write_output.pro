@@ -27,12 +27,12 @@ PRO write_output, out_dir, total_image, count_image, current_year, current_mon, 
 	if(is_hh) then begin
 		for i=0, 23 do begin
 			out_val_file[i] = out_dir + '/RapidSCAT_pow_' + strtrim(string(current_year,format='(I4)'),2) + '_' + mon_string[current_mon] + '_' + strtrim(string(i,format='(I02)'),2) + 'HR_h.flt'
-			out_count_file[i] = out_dir + '/RapidSCAT_count_' + strtrim(string(current_year,format='(I4)'),2) + '_' + mon_string[current_mon] + '_' + strtrim(string(i,format='(I02)'),2) + 'HR_h.flt'
+			out_count_file[i] = out_dir + '/RapidSCAT_count_' + strtrim(string(current_year,format='(I4)'),2) + '_' + mon_string[current_mon] + '_' + strtrim(string(i,format='(I02)'),2) + 'HR_h.byt'
 		endfor
 	endif else begin
 		for i=0, 23 do begin
 			out_val_file[i] = out_dir + '/RapidSCAT_pow_' + strtrim(string(current_year,format='(I4)'),2) + '_' + mon_string[current_mon] + '_' + strtrim(string(i,format='(I02)'),2) + 'HR_v.flt'
-			out_count_file[i] = out_dir + '/RapidSCAT_count_' + strtrim(string(current_year,format='(I4)'),2) + '_' + mon_string[current_mon] + '_' + strtrim(string(i,format='(I02)'),2) + 'HR_v.flt'
+			out_count_file[i] = out_dir + '/RapidSCAT_count_' + strtrim(string(current_year,format='(I4)'),2) + '_' + mon_string[current_mon] + '_' + strtrim(string(i,format='(I02)'),2) + 'HR_v.byt'
 		endfor
 	endelse
 
