@@ -102,8 +102,6 @@ PRO process_directory, in_dir, revtime_file, out_dir
 			power_total_hh[x_ind,y_ind,local_hr_hh[i]] += (10.^ (sigma0_hh[i] / 1000.))/cos(inc_rad_hh[i])
 			pulse_count_hh[x_ind,y_ind,local_hr_hh[i]] += 1
 
-			stop
-
 		endfor			
 
 
