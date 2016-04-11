@@ -121,9 +121,21 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, inc_rad_hh,
 			local_hr_hh[*] = fix(frame_hr[hh_index/100] + lon_to_180(lon_hh)/15)  ;/15 = /180 * 12
 			;wrap hr < 0 and hr > 23
 			index = where(local_hr_hh lt 0, count)
-			if (count gt 0) then local_hr_hh[index] += 24
+			if (count gt 0) then begin
+				local_hr_hh[index] += 24
+				day_hh[index] -= 1
+				index2 = where(day_hh[index] lt 1, count2)
+				if (count2 gt 0) then begin
+					(day_hh[index])[index2] = 365  ;ignore leap years, it will fall into the last month bin in any case
+					(year_hh[index])[index2] -= 1
+				endif
+			endif
 			index = where(local_hr_hh gt 23, count)
-			if (count gt 0) then local_hr_hh[index] -= 24
+			if (count gt 0) then begin
+				local_hr_hh[index] -= 24
+				day_hh[index] += 1
+				;ignore increamenting year, just keep in the last bin
+			endif
 		endif
 
 		if (vv_count gt 0) then begin
@@ -140,9 +152,21 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, inc_rad_hh,
 			local_hr_vv[*] = fix(frame_hr[vv_index/100] + lon_to_180(lon_vv)/15)  ;/15 = /180 * 12
 			;wrap hr < 0 and hr > 23
 			index = where(local_hr_vv lt 0, count)
-			if (count gt 0) then local_hr_vv[index] += 24
+			if (count gt 0) then begin
+				local_hr_vv[index] += 24
+				day_vv[index] -= 1
+				index2 = where(day_vv[index] lt 1, count2)
+				if (count2 gt 0) then begin
+					(day_vv[index])[index2] = 365 
+					(year_vv[index])[index2] -= 1
+				endif
+			endif
+
 			index = where(local_hr_vv gt 23, count)
-			if (count gt 0) then local_hr_vv[index] -= 24
+			if (count gt 0) then begin
+				local_hr_vv[index] -= 24
+				day_vv[index] += 1
+			endif
 		endif
 
 	endif
