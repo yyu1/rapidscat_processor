@@ -124,10 +124,10 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, inc_rad_hh,
 			if (count gt 0) then begin
 				local_hr_hh[index] += 24
 				day_hh[index] -= 1
-				index2 = where(day_hh[index] lt 1, count2)
+				index2 = where(day_hh lt 1, count2)
 				if (count2 gt 0) then begin
-					(day_hh[index])[index2] = 365  ;ignore leap years, it will fall into the last month bin in any case
-					(year_hh[index])[index2] -= 1
+					day_hh[index2] = 365  ;ignore leap years, it will fall into the last month bin in any case
+					year_hh[index2] -= 1
 				endif
 			endif
 			index = where(local_hr_hh gt 23, count)
@@ -155,10 +155,10 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, inc_rad_hh,
 			if (count gt 0) then begin
 				local_hr_vv[index] += 24
 				day_vv[index] -= 1
-				index2 = where(day_vv[index] lt 1, count2)
+				index2 = where(day_vv lt 1, count2)
 				if (count2 gt 0) then begin
-					(day_vv[index])[index2] = 365 
-					(year_vv[index])[index2] -= 1
+					day_vv[index2] = 365 
+					year_vv[index2] -= 1
 				endif
 			endif
 
