@@ -7,6 +7,9 @@ PRO process_directory, in_dir, revtime_file, out_dir
 
 	;!EXCEPT = 2  ;verbose reporting on math errors
 
+	;Setting
+	n_months = 20
+
 	;Test if in_dir and out_dir exists
 	if(not(file_test(in_dir, /directory) and file_test(out_dir, /directory))) then begin
 		print, 'Fatal Error:  input or output directory not valid.', in_dir, out_dir
@@ -43,16 +46,12 @@ PRO process_directory, in_dir, revtime_file, out_dir
 
 	;Create image for current total and count
 	;0.25deg x 0.25 deg
-	power_total_hh = fltarr(1440,720,24)
-	power_total_vv = fltarr(1440,720,24)
-	pulse_count_hh = bytarr(1440,720,24)
-	pulse_count_vv = bytarr(1440,720,24)
-	current_year_hh = 0
-	current_year_vv = 0
-	;current_day_hh = 0
-	;current_day_vv = 0
-	current_mon_hh = 0  ;Month here is defined as (Julian day / 30)<11  where the division is integer division
-	current_mon_vv = 0  ;Therefore, the last month has 35 - 36 days, this is used to tell when to reset our averaging
+	power_total_hh = fltarr(1440,720,24,n_months)
+	power_total_vv = fltarr(1440,720,24,n_months)
+	pulse_count_hh = bytarr(1440,720,24,n_months)
+	pulse_count_vv = bytarr(1440,720,24,n_months)
+	has_points_hh = bytarr(n_months)
+	has_points_vv = bytarr(n_months)
 
 	;Cycle through each input revolution file.  Based on the naming convention, files should be in chronological order
 
@@ -86,23 +85,13 @@ PRO process_directory, in_dir, revtime_file, out_dir
 			if (x_ind eq 1440) then x_ind = 0  ; wrap end points
 			if (x_ind lt 720) then x_ind += 720 else x_ind -=720   ; change to -180 to 180 degree format
 			if (y_ind eq 720) then y_ind = 0  ; wrap end points
-			
-			if ((get_mon(day_hh[i]) ne current_mon_hh) or (year_hh[i] ne current_year_hh)) then begin
-				;Reached new mon, write output, and reset
-				write_output, out_dir, power_total_hh, pulse_count_hh, current_year_hh, current_mon_hh, 1  ;1 because this is h polarization
 
-				;after writing output of previous collected data, reset to new mon and add our current pulse
-				power_total_hh[*] = 0
-				pulse_count_hh[*] = 0
+			mon_index = (year_hh[i] - 2014)*12 + get_mon(day_hh[i]) - 9
 
-				current_year_hh = year_hh[i]
-				current_mon_hh = get_mon(day_hh[i])
-			endif
-		
-			power_total_hh[x_ind,y_ind,local_hr_hh[i]] += (10.^ (sigma0_hh[i] / 1000.))/cos(inc_rad_hh[i])
-			pulse_count_hh[x_ind,y_ind,local_hr_hh[i]] += 1
-
-		endfor			
+			power_total_hh[x_ind,y_ind,local_hr_hh[i],mon_index] += (10.^ (sigma0_hh[i] / 1000.))/cos(inc_rad_hh[i])
+			pulse_count_hh[x_ind,y_ind,local_hr_hh[i],mon_index] += 1
+			has_points_hh[mon_index] = 1
+		endfor
 
 
 		;Process vv pulses
@@ -116,29 +105,28 @@ PRO process_directory, in_dir, revtime_file, out_dir
 			if (x_ind eq 1440) then x_ind = 0  ; wrap end points
 			if (x_ind lt 720) then x_ind += 720 else x_ind -=720   ; change to -180 to 180 degree format
 			if (y_ind eq 720) then y_ind = 0  ; wrap end points
-			
-			if ((get_mon(day_vv[i]) ne current_mon_vv) or (year_vv[i] ne current_year_vv)) then begin
-				;Reached new mon, write output, and reset
-				write_output, out_dir, power_total_vv, pulse_count_vv, current_year_vv, current_mon_vv, 0  ;0 because this is v polarization
-
-				;after writing output of previous collected data, reset to new mon and add our current pulse
-				power_total_vv[*] = 0
-				pulse_count_vv[*] = 0
-
-				current_year_vv = year_vv[i]
-				current_mon_vv = get_mon(day_vv[i])
-			endif
-
-			power_total_vv[x_ind,y_ind,local_hr_vv[i]] += (10.^ (sigma0_vv[i] / 1000.))/cos(inc_rad_vv[i])
-			pulse_count_vv[x_ind,y_ind,local_hr_vv[i]] += 1
-
-		endfor			
+		
+			mon_index = (year_vv[i] - 2014)*12 + get_mon(day_vv[i]) - 9
+			power_total_vv[x_ind,y_ind,local_hr_vv[i],mon_index] += (10.^ (sigma0_vv[i] / 1000.))/cos(inc_rad_vv[i])
+			pulse_count_vv[x_ind,y_ind,local_hr_vv[i],mon_index] += 1
+			has_points_vv[mon_index] = 1
+		endfor
+	
 
 
 	endfor
-	;Flush the remaining cache
-	write_output, out_dir, power_total_hh, pulse_count_hh, current_year_hh, current_mon_hh, 1  ;1 because this is h polarization
-	write_output, out_dir, power_total_vv, pulse_count_vv, current_year_vv, current_mon_vv, 0  ;0 because this is v polarization
+
+	;Write output
+	for i=0, n_months-1 do begin
+		current_year = (i+9)/12 + 2014
+		current_month = (i+9) - (current_year-2014)*12
+		if has_points_hh[i] then begin
+			write_output, out_dir, power_total_hh[*,*,*,i], pulse_count_hh[*,*,*,i], current_year, current_month, 1  ;1 for h pol
+		endif
+		if has_points_vv[i] then begin
+			write_output, out_dir, power_total_vv[*,*,*,i], pulse_count_vv[*,*,*,i], current_year, current_month, 0  ;1 for h pol
+		endif
+	endfor
 
 	print, 'Finished processing directory.', systime()
 
