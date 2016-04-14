@@ -118,7 +118,7 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, inc_rad_hh,
 			year_hh = intarr(hh_count)
 			year_hh[*] = frame_year[hh_index/100]
 			local_hr_hh = intarr(hh_count)
-			local_hr_hh[*] = fix(frame_hr[hh_index/100] + lon_to_180(lon_hh)/15)  ;/15 = /180 * 12
+			local_hr_hh[*] = floor(frame_hr[hh_index/100] + lon_to_180(lon_hh)/15)  ;/15 = /180 * 12
 			;wrap hr < 0 and hr > 23
 			index = where(local_hr_hh lt 0, count)
 			if (count gt 0) then begin
@@ -149,7 +149,7 @@ PRO read_rev, file_name, start_time, end_time, sigma0_hh, sigma0_vv, inc_rad_hh,
 			year_vv = intarr(vv_count)
 			year_vv[*] = frame_year[vv_index/100]
 			local_hr_vv = intarr(vv_count)
-			local_hr_vv[*] = fix(frame_hr[vv_index/100] + lon_to_180(lon_vv)/15)  ;/15 = /180 * 12
+			local_hr_vv[*] = floor(frame_hr[vv_index/100] + lon_to_180(lon_vv)/15)  ;/15 = /180 * 12
 			;wrap hr < 0 and hr > 23
 			index = where(local_hr_vv lt 0, count)
 			if (count gt 0) then begin
