@@ -65,7 +65,7 @@ PRO process_directory, in_dir, revtime_file, out_dir
 			continue
 		endif
 
-		if ((strmid(note[rev_index],0,4) ne 'GOOD') then begin
+		if (strmid(note[rev_index],0,4) ne 'GOOD') then begin
 			print, 'Not good rev at rev#', cur_rev, '  skipping...'
 			continue
 		endif
