@@ -65,8 +65,13 @@ PRO process_directory, in_dir, revtime_file, out_dir
 			continue
 		endif
 
-		if (strmid(note[rev_index],0,3) eq 'BAD') then begin
-			print, 'Bad rev at rev#', cur_rev, '  skipping...'
+		if ((strmid(note[rev_index],0,4) ne 'GOOD') then begin
+			print, 'Not good rev at rev#', cur_rev, '  skipping...'
+			continue
+		endif
+
+		if (strmatch(note[rev_index], 'Large Pitch', /FOLD_CASE)) then begin
+			print, 'Large pitch at rev#', cur_rev, '  skipping...'
 			continue
 		endif
 
